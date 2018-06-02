@@ -1,6 +1,7 @@
 import * as React from 'react';
 import './App.css';
 import Hello from './components/Hello';
+import PlayGrid from './components/PlayGrid';
 import logo from './logo.svg';
 
 class App extends React.Component {
@@ -15,6 +16,7 @@ class App extends React.Component {
           To get started, edit <code>src/App.tsx</code> and save to reload.
         </p>
         <Hello name="TypeScript" enthusiasmLevel={2} />
+        <PlayGrid/>
       </div>
     );
   }
