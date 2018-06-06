@@ -9,9 +9,9 @@ export class Grid implements IGrid {
     public cells: IGridCell[][];
     public rows: number[];
 
-    constructor() {
-        this.width = 10;
-        this.height = 10;
+    constructor(width: number, height: number) {
+        this.width = width;
+        this.height = height;
         this.cells = [];
         for(let row = 0; row < this.height; row++)
         {

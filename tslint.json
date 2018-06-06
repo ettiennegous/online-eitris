@@ -1,8 +1,9 @@
 {
   "extends": ["tslint:recommended", "tslint-react", "tslint-config-prettier"],
   "rules": {
-    "no-console": "off",
-    "no-debugger": "off"
+    "no-debugger": false,
+    "no-bitwise": false, 
+    "no-console": false
   },
   "linterOptions": {
     
