@@ -5,4 +5,5 @@ export interface ITetromino {
     layout: number;
     xpos: number;
     ypos: number;
+    rotate(direction: Enums.Rotation) : void;
 }
