@@ -17,8 +17,8 @@ export class Tetromino implements ITetromino {
         this.layouts.push(southLayout);
         this.layouts.push(eastLayout);
         this.layouts.push(westLayout);
-        this.xpos = 5;
-        this.ypos = 0;
+        this.xpos = 4;
+        this.ypos = -4;
         this.orientation = Enums.Orientation.North;
     }
 
@@ -26,8 +26,23 @@ export class Tetromino implements ITetromino {
         return this.layouts[this.orientation];
     }
 
-    public rotate(direction: Enums.Rotation) {
-        if(direction === Enums.Rotation.Clockwise) {
+    public move(direction: Enums.Direction) {
+        switch(direction)
+        {
+            case Enums.Direction.Down:
+                this.ypos++;
+            break;
+            case Enums.Direction.Left:
+                this.xpos--;
+            break;
+            case Enums.Direction.Right:
+                this.xpos++;
+            break;
+        }
+    }
+
+    public rotate(rotation: Enums.Rotation) {
+        if(rotation === Enums.Rotation.Clockwise) {
            if(this.orientation === 3) {
             this.orientation = 0;
            }

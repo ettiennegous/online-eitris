@@ -2,14 +2,14 @@ import * as React from 'react';
 import PlayGrid from './components/PlayGrid';
 
 // type MyProps = { here: string };
-interface IMyState { date: number };
+interface IMyState { RenderLoopCounter: number };
 
 class GameLoop extends React.Component<{}, IMyState> {
     public timerID: NodeJS.Timer;
   
     constructor(props: any) {
         super(props);
-        this.state = {date: new Date().getSeconds()};
+        this.state = {RenderLoopCounter: new Date().getSeconds()};
         
     }
   
@@ -29,15 +29,15 @@ class GameLoop extends React.Component<{}, IMyState> {
       return (
           <div>
               <h1>Timer:</h1>
-              <h2>{this.state.date}</h2>
-              <PlayGrid RenderLoop={this.state.date} />
+              <h2>{this.state.RenderLoopCounter}</h2>
+              <PlayGrid RenderLoopCounter={this.state.RenderLoopCounter} />
           </div>
       );
     }
 
     private tick() {
         this.setState({
-          date: new Date().getSeconds()
+          RenderLoopCounter: new Date().getSeconds()
         });
       }
   }

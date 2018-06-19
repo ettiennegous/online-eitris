@@ -21,6 +21,13 @@ export enum Rotation {
     CounterClockWise
 }
 
+export enum Direction {
+    Down,
+    Left,
+    Right
+}
+
+
 export enum Keys {
     ArrowLeft = "ArrowLeft",
     ArrowRight = "ArrowRight",
