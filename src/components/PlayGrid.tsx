@@ -18,12 +18,12 @@ class PlayGrid extends React.Component<IMyProps, IMyState> {
         }
         else {
             // debugger;
-            const newPiece = PlayGrid.getRandomShapeFromBag(state.shapes.length === 0 ? PlayGrid.buildPiecesBag(4) : state.shapes);
-            state = {
-                RenderLoopCounter: state.RenderLoopCounter, 
-                shapes: newPiece.ResultPiecesBag,
-                theShape: newPiece.RandomPiece
-            };
+            // const newPiece = PlayGrid.getRandomShapeFromBag(state.shapes.length === 0 ? PlayGrid.buildPiecesBag(4) : state.shapes);
+            // state = {
+            //     RenderLoopCounter: state.RenderLoopCounter, 
+            //     shapes: newPiece.ResultPiecesBag,
+            //     theShape: newPiece.RandomPiece
+            // };
         }
         return state;
     }
@@ -69,27 +69,8 @@ class PlayGrid extends React.Component<IMyProps, IMyState> {
         const pieces = PlayGrid.buildPiecesBag(4);
         const result = PlayGrid.getRandomShapeFromBag(pieces);
         this.state = { RenderLoopCounter: props.RenderLoopCounter, shapes: result.ResultPiecesBag, theShape: result.RandomPiece };
-         
-        // state.shapes = ;
-        // this.state.theShape = this.getRandomShapeFromBag();
         window.onkeydown = (ev: KeyboardEvent): any => this.keyPress(ev);
-        // const currentBlock  = shapes[Math.floor(Math.random() * shapes.length - 1) + 0];
-        this.grid.height = 10;
     }
-
-
-    // public getSnapshotBeforeUpdate() {
-
-    // }
-
-    // public componentDidMount() {
-    //     // if(this.state.theShape == null) {
-    //     //     this.setState({
-    //     //         shapes: this.state.shapes,
-    //     //         theShape: 
-    //     //     });
-    //     // }
-    // }
 
     public keyPress(ev: KeyboardEvent) {
         if(ev.code.startsWith("Arrow"))
@@ -138,19 +119,28 @@ class PlayGrid extends React.Component<IMyProps, IMyState> {
     private RenderTetrimino(x: number, y: number, block: ITetromino) {
         // Assume North for now
         // const temp = block.layout >>> 0;
-        x = x - block.xpos;
-        y = y - block.ypos;
+        // const xAdjusted = x - block.xpos; 
+        // const yAdjusted = y - block.ypos;
         const binaryNotation = (block.layout >>> 0).toString(2); // This will give a binary notation dump of the current block, this can be substringed per cell 0x4444 = 100010001000100
-        const paddedBinaryNotation = this.padStr(binaryNotation, 16, '0'); // = 0100010001000100
-        
+        const paddedBinaryNotation = this.padStr(binaryNotation, 16, '0');
+        // 0100 - Row 1
+        // 0100 - Row 2
+        // 0100 - Row 3 
+        // 0100 - Row 4
+
+        // this.grid.width
         // for(let x2:number = 0; x2 < 4; x2++) {
         // for(let y2:number = 0; y2 < 4; y2++) {
         // const binaryRow = paddedBinaryNotation.substr(y2 * 4, 4);
         // if(binaryRow.substr(x2, 1) === "1") { return block.colour; }
         // }
         // }
-        const binaryRow = paddedBinaryNotation.substr(y * 4, 4);
-        if (binaryRow.substr(x, 1) === "1") { return block.colour; }
+        // debugger;
+        const binaryRow1 = paddedBinaryNotation.substr(y * 4, 4);
+        const binaryRow2 = (parseInt(binaryRow1, 2) >> block.xpos).toString(2); 
+        const binaryRow3 =  this.padStr(binaryRow2, 10, '0');
+        // binaryRow = (Number(binaryRow) >> xAdjusted).toString(2);
+        if (binaryRow3.substr(x, 1) === "1") { return block.colour; }
         return Enums.Colours.Transparent;
         // 0100010001000100 
         // 0,4
@@ -159,6 +149,7 @@ class PlayGrid extends React.Component<IMyProps, IMyState> {
         // 12,4
         // console.log();
     }
+
 
     private padStr(strToPad: string, width: number, paddingString: string) {
         paddingString = paddingString || '0';

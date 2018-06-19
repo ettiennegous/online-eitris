@@ -17,8 +17,8 @@ export class Tetromino implements ITetromino {
         this.layouts.push(southLayout);
         this.layouts.push(eastLayout);
         this.layouts.push(westLayout);
-        this.xpos = 4;
-        this.ypos = -4;
+        this.xpos = 0;
+        this.ypos = 0;
         this.orientation = Enums.Orientation.North;
     }
 
