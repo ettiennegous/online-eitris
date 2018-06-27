@@ -6,7 +6,7 @@ export class GridCell implements IGridCell {
     public isoccupied: boolean;
     public colour: string;
 
-    constructor(row:number, column:number) {
+    constructor(column:number, row:number) {
         this.x = column
         this.y = row
         this.isoccupied = false;

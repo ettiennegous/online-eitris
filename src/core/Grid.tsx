@@ -13,12 +13,12 @@ export class Grid implements IGrid {
         this.width = width;
         this.height = height;
         this.cells = [];
-        for(let row = 0; row < this.height; row++)
+        for(let column = this.width - 1; column >= 0; column--)
         {
-            this.cells[row] = [];
-            for(let column = 0; column < this.width; column++)
+            this.cells[column] = []; 
+            for(let row = 0; row < this.height; row++)    
             {
-                this.cells[row][column] = new GridCell(row, column);
+                this.cells[column][row] = new GridCell(column, row);
             }
         }
     }

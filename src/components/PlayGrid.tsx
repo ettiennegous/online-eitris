@@ -14,7 +14,7 @@ class PlayGrid extends React.Component<IMyProps, IMyState> {
 
     protected static getDerivedStateFromProps(props : any, state : IMyState) {
         if(state.theShape.ypos <= 6) { // Need to figure out collision detection!
-            state.theShape.ypos++;
+            // state.theShape.ypos++;
         }
         else {
             // debugger;
@@ -62,7 +62,6 @@ class PlayGrid extends React.Component<IMyProps, IMyState> {
 
     private grid: IGrid = new Grid(10, 10);
 
-
     constructor(props: any) {
         super(props);
 
@@ -103,30 +102,23 @@ class PlayGrid extends React.Component<IMyProps, IMyState> {
     }
 
     private renderColumnsAndRows(cells: IGridCell[][], block: ITetromino) {
-        return cells.map((row, rowCounter) => {
-
+        return cells.map((column, columnCounter) => {
             return (
-                <div key={row[rowCounter].y} className="Row-wrapper">
+                <div key={column[columnCounter].y} className="Row-wrapper">
                     {
-                        row.map((column, columnCounter) => {
-                            return (<div key={column.x} className="Row-cell" style={{ backgroundColor: this.RenderTetrimino(column.x, column.y, block) }}>{column.x}, {column.y}</div>);
+                        column.map((cell, cellCounter) => {
+                            return (<div key={cell.x + ' ' + cell.y} className="Row-cell" style={{ backgroundColor: this.renderTetrimino(cell.x, cell.y, block) }}>{cell.x}, {cell.y}</div>);
                         })
                     }
-                </div>);
+                </div>);    
         });
     }
 
-    private RenderTetrimino(x: number, y: number, block: ITetromino) {
+    private renderTetrimino(x: number, y: number, block: ITetromino) {
         // Assume North for now
         // const temp = block.layout >>> 0;
-        // const xAdjusted = x - block.xpos; 
-        // const yAdjusted = y - block.ypos;
-        const binaryNotation = (block.layout >>> 0).toString(2); // This will give a binary notation dump of the current block, this can be substringed per cell 0x4444 = 100010001000100
-        const paddedBinaryNotation = this.padStr(binaryNotation, 16, '0');
-        // 0100 - Row 1
-        // 0100 - Row 2
-        // 0100 - Row 3 
-        // 0100 - Row 4
+        const xAdjusted = x - block.ypos; 
+        const yAdjusted = y - block.xpos;
 
         // this.grid.width
         // for(let x2:number = 0; x2 < 4; x2++) {
@@ -136,26 +128,48 @@ class PlayGrid extends React.Component<IMyProps, IMyState> {
         // }
         // }
         // debugger;
-        const binaryRow1 = paddedBinaryNotation.substr(y * 4, 4);
-        const binaryRow2 = (parseInt(binaryRow1, 2) >> block.xpos).toString(2); 
-        const binaryRow3 =  this.padStr(binaryRow2, 10, '0');
+        // const binaryRow1 = (block.layout >>> 0).toString(2).substr(y * 4, 4);
+        // let binaryRow2 = '';
+        // // console.log(block.xpos);
+        // if(block.xpos > 6) {
+        //     binaryRow2 = (parseInt(binaryRow1, 2) >> (block.xpos - 6)).toString(2); 
+        // }
+        // else {
+        //     binaryRow2 = (parseInt(binaryRow1, 2) << (6 - block.xpos)).toString(2); 
+        // }
+
+        
+        // const binaryRow3 =  this.padStrLeft(binaryRow2, 10, '0');
         // binaryRow = (Number(binaryRow) >> xAdjusted).toString(2);
-        if (binaryRow3.substr(x, 1) === "1") { return block.colour; }
-        return Enums.Colours.Transparent;
+        // if (binaryRow3.substr(x, 1) === "1") { return block.colour; }
+        // return Enums.Colours.Transparent;
         // 0100010001000100 
         // 0,4
         // 4,4
         // 8,4
         // 12,4
         // console.log();
+        if(block.tetrominoGrid.cells[xAdjusted] && block.tetrominoGrid.cells[xAdjusted][yAdjusted]) {
+            return block.tetrominoGrid.cells[xAdjusted][yAdjusted].colour;
+        }
+        else {
+            return Enums.Colours.Transparent;
+        }
+        
     }
 
 
-    private padStr(strToPad: string, width: number, paddingString: string) {
-        paddingString = paddingString || '0';
-        strToPad = strToPad + '';
-        return strToPad.length >= width ? strToPad : new Array(width - strToPad.length + 1).join(paddingString) + strToPad;
-    }
+    // private padStrLeft(strToPad: string, width: number, paddingString: string) {
+    //     paddingString = paddingString || '0';
+    //     strToPad = strToPad + '';
+    //     return strToPad.length >= width ? strToPad : new Array(width - strToPad.length + 1).join(paddingString) + strToPad;
+    // }
+
+    // private padStrRight(strToPad: string, width: number, paddingString: string) {
+    //     paddingString = paddingString || '0';
+    //     strToPad = strToPad + '';
+    //     return strToPad.length >= width ? strToPad : strToPad + new Array(width - strToPad.length + 1).join(paddingString);
+    // }
 }
 
 export default PlayGrid;
