@@ -3,6 +3,8 @@ import { Grid } from '../core/Grid'
 import { IGrid } from '../core/IGrid'
 import { ITetromino } from './ITetromino'
 
+
+interface IBitShiftResult { binaryRows: string[], isValid: boolean};
 // See this page that explains the binary block layout https://codeincomplete.com/posts/javascript-tetris/
 export class Tetromino implements ITetromino {
 
@@ -48,8 +50,6 @@ export class Tetromino implements ITetromino {
         let result: string = '';
         this.tetrominoGrid.cells.map((column, columnCounter) => {
             column.map((cell, rowCounter) => {
-                // Intentional switch of row and column, 
-                // the X, Y notation is preffered but when rendering the blocks left to right one row after the next it needs to be row first
                 result += this.tetrominoGrid.cells[columnCounter][rowCounter].isoccupied ? '1' : '0'; 
             })
             result += '\r\n';
@@ -64,37 +64,43 @@ export class Tetromino implements ITetromino {
                 this.ypos++;
             break;
             case Enums.Direction.Left:
-                this.xpos--;
+                if(this.bitMagic(this.layout, (this.xpos - 1)).isValid) {
+                    this.xpos--;
+                }
+                
             break;
             case Enums.Direction.Right:
-                this.xpos++;
+                if(this.bitMagic(this.layout, (this.xpos + 1)).isValid) {
+                    this.xpos++;
+                }
             break;
         }
         this.calculateGrid();
     }
 
     public rotate(rotation: Enums.Rotation) {
-        if(rotation === Enums.Rotation.Clockwise) {
-           if(this.orientation === 3) {
-            this.orientation = 0;
-           }
-           else {
-            this.orientation++;
-           }
-        }
-        else {
+        if(rotation === Enums.Rotation.CounterClockWise) {
+            console.log('cw' + this.xpos);
             if(this.orientation === 0) {
                 this.orientation = 3;
-               }
-               else {
+            }
+            else {
                 this.orientation--;
-               }
+            }
+
+            // This happens when you rotate a piece of the edge of the grid 
+            // and it swings outside of the play grid
+            if(!this.bitMagic(this.layout, this.xpos).isValid) {
+                this.xpos > 6 ? this.xpos-- : this.xpos++;
+            }
         }
+
+        
         this.calculateGrid();
     }
 
     public calculateGrid(): void {
-        const binaryRows:string[] = this.bitShiftTetrominoPiece(this.convertToGridSizedArray(this.layout), this.xpos);
+        const binaryRows:string[] = this.bitMagic(this.layout, this.xpos).binaryRows;
         this.consoleLogBinaryRows(binaryRows);
         this.tetrominoGrid.cells.map((column, columnCounter) => {
             column.map((row, rowCounter) => {
@@ -146,8 +152,14 @@ export class Tetromino implements ITetromino {
         return newLength;
     }
 
+    private bitMagic(layout: number, xpos: number) : IBitShiftResult {
+        return this.bitShiftTetrominoPiece(this.convertToGridSizedArray(layout), xpos);
+    }
+
+
     // Here be deamons, lots of bit magic
-    private bitShiftTetrominoPiece(binaryRows: string[], xpos: number) : string[] {
+    private bitShiftTetrominoPiece(binaryRows: string[], xpos: number) : IBitShiftResult {
+        let isValid = true;
         binaryRows.forEach((element, index) => {
             const charArray = element.split('');
             let indexToCheck = 0;
@@ -176,10 +188,14 @@ export class Tetromino implements ITetromino {
                 if(charArray[indexToCheck] !== '1') {
                     binaryRows[index] = arrActions(charArray).join('');
                 }
+                else {
+                    isValid = false;
+                }
                 
             }
         });
-        return binaryRows;
+        const result : IBitShiftResult = { binaryRows, isValid };
+        return result;
     }
 
     // private bitShiftTetrominoPiece2(binaryRows: string[], xpos: number, action: () => any) : string[] {
