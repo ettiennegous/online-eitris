@@ -117,9 +117,9 @@ class PlayGrid extends React.Component<IMyProps, IMyState> {
     private renderTetrimino(x: number, y: number, block: ITetromino) {
         // Assume North for now
         // const temp = block.layout >>> 0;
-        const xAdjusted = x - block.ypos; 
-        const yAdjusted = y - block.xpos;
-
+        const xAdjusted = x;// - block.ypos; 
+        const yAdjusted = y;// - block.xpos;
+        
         // this.grid.width
         // for(let x2:number = 0; x2 < 4; x2++) {
         // for(let y2:number = 0; y2 < 4; y2++) {

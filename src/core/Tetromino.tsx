@@ -5,14 +5,28 @@ import { ITetromino } from './ITetromino'
 
 // See this page that explains the binary block layout https://codeincomplete.com/posts/javascript-tetris/
 export class Tetromino implements ITetromino {
+
+    public static padStrLeft(strToPad: string, width: number, paddingString: string) {
+        paddingString = paddingString || '0';
+        strToPad = strToPad + '';
+        return strToPad.length >= width ? strToPad : new Array(width - strToPad.length + 1).join(paddingString) + strToPad;
+    }
+
+    public static padStrRight(strToPad: string, width: number, paddingString: string) {
+        paddingString = paddingString || '0';
+        strToPad = strToPad + '';
+        return strToPad.length >= width ? strToPad : strToPad + new Array(width - strToPad.length + 1).join(paddingString);
+    }
+
+
     public name: string; // I, L, J, O, Z, T, S, Make enum?
     public colour: Enums.Colours;
     public xpos: number;
     public ypos: number;
     public orientation: Enums.Orientation; // 0 North 1 East 3 South 4 West
-    public tetrominoGrid: IGrid = new Grid(4, 4);
+    public tetrominoGrid: IGrid = new Grid(10, 10);
     private layouts: number[] = [];
-    
+
     constructor(name: string, colour: Enums.Colours, northLayout: number, southLayout: number, eastLayout: number, westLayout: number) {
         this.name = name;
         this.colour = colour;
@@ -36,7 +50,7 @@ export class Tetromino implements ITetromino {
             column.map((cell, rowCounter) => {
                 // Intentional switch of row and column, 
                 // the X, Y notation is preffered but when rendering the blocks left to right one row after the next it needs to be row first
-                result += this.tetrominoGrid.cells[rowCounter][columnCounter].isoccupied ? '1' : '0'; 
+                result += this.tetrominoGrid.cells[columnCounter][rowCounter].isoccupied ? '1' : '0'; 
             })
             result += '\r\n';
         });
@@ -55,7 +69,8 @@ export class Tetromino implements ITetromino {
             case Enums.Direction.Right:
                 this.xpos++;
             break;
-        } 
+        }
+        this.calculateGrid();
     }
 
     public rotate(rotation: Enums.Rotation) {
@@ -78,15 +93,12 @@ export class Tetromino implements ITetromino {
         this.calculateGrid();
     }
 
-    private calculateGrid(): void {
-        const binaryNotation = this.padStrLeft((this.layout >>> 0).toString(2), 16, '0'); // This will give a binary notation dump of the current block, this can be substringed per cell 0x4444 = 100010001000100
-        // 0100 - Row 1
-        // 0100 - Row 2
-        // 0100 - Row 3 
-        // 0100 - Row 4
+    public calculateGrid(): void {
+        const binaryRows:string[] = this.bitShiftTetrominoPiece(this.convertToGridSizedArray(this.layout), this.xpos);
+        this.consoleLogBinaryRows(binaryRows);
         this.tetrominoGrid.cells.map((column, columnCounter) => {
             column.map((row, rowCounter) => {
-                if(binaryNotation.substr(rowCounter * 4, 4).substr(columnCounter, 1) === "1") {
+                if(binaryRows[columnCounter] && binaryRows[columnCounter].split('')[rowCounter] === "1") {
                     this.tetrominoGrid.cells[columnCounter][rowCounter].colour = this.colour;
                     this.tetrominoGrid.cells[columnCounter][rowCounter].isoccupied = true;
                 }
@@ -98,9 +110,81 @@ export class Tetromino implements ITetromino {
         });
     }
 
-    private padStrLeft(strToPad: string, width: number, paddingString: string) {
-        paddingString = paddingString || '0';
-        strToPad = strToPad + '';
-        return strToPad.length >= width ? strToPad : new Array(width - strToPad.length + 1).join(paddingString) + strToPad;
+
+    // 0100 - Row 1
+    // 0100 - Row 2
+    // 0100 - Row 3 
+    // 0100 - Row 4
+    private consoleLogBinaryRows(binaryRows: string[]) : void {
+        let output = '';
+        binaryRows.forEach((element, index) => {
+            output += (element + '\r\n');
+        });
+        console.log(output + 'Done');
     }
+    
+
+    private convertToGridSizedArray(layout: number) : string[] {
+        const newLength:string[] = [];
+        let newLengthCounter = 0;
+        const binaryNotation = Tetromino.padStrLeft((layout >>> 0).toString(2), 16, '0'); // This will give a binary notation dump of the current block, this can be substringed per cell 0x4444 = 100010001000100
+        let binaryNotationTemp = binaryNotation;
+
+        // Add extra rows on top as it moves down
+        for(let a = 0; a < this.ypos; a++) {
+            newLength[newLengthCounter] = Tetromino.padStrRight('', 10, '0');
+            newLengthCounter++;
+        }
+
+        // Chop the string into 4 bit pieces for each row
+        while(binaryNotationTemp.length) {
+            
+            newLength[newLengthCounter] = Tetromino.padStrRight(binaryNotationTemp.substr(0, 4), 10, '0');
+            binaryNotationTemp = binaryNotationTemp.substr(4);            
+            newLengthCounter++;
+        }
+        return newLength;
+    }
+
+    // Here be deamons, lots of bit magic
+    private bitShiftTetrominoPiece(binaryRows: string[], xpos: number) : string[] {
+        binaryRows.forEach((element, index) => {
+            const charArray = element.split('');
+            let indexToCheck = 0;
+            let itteratorCount = 0;
+            let arrActions;
+            if(xpos > 0) {
+                indexToCheck = charArray.length-1;
+                itteratorCount = xpos;
+                arrActions = (arr: string[]) : string[] => {
+                    arr.pop();
+                    arr.unshift('0');
+                    return arr
+                }
+            }
+            else {
+                indexToCheck = 0;
+                itteratorCount = Math.abs(xpos);
+                arrActions = (arr: string[]) : string[] => {
+                    arr.shift();
+                    arr.push('0');
+                    return arr;
+                }
+            }
+
+            for(let a = 0; a < itteratorCount; a++) {
+                if(charArray[indexToCheck] !== '1') {
+                    binaryRows[index] = arrActions(charArray).join('');
+                }
+                
+            }
+        });
+        return binaryRows;
+    }
+
+    // private bitShiftTetrominoPiece2(binaryRows: string[], xpos: number, action: () => any) : string[] {
+
+    // }
+
+
 }
